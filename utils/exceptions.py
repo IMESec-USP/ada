@@ -1,0 +1,2 @@
+class GithubSignatureException(Exception):
+    pass
