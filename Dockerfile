@@ -10,4 +10,5 @@ copy requirements.txt /ada
 run pip install -r requirements.txt
 
 copy . .
-cmd ["gunicorn", "app:app"]
+expose 8000
+cmd ["gunicorn", "-b", "0.0.0.0:8000", "app:app"]
