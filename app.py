@@ -10,7 +10,14 @@ from resources.docker_hub import DockerHub
 from utils.logger import Logger
 from utils.telegram import TelegramHandler
 
-from constants import TELEGRAM_API_TOKEN, CONVERSATIONS, GITHUB_SECRET
+from healthcheck.health_check import start_health_check
+
+from constants import (TELEGRAM_API_TOKEN,
+                      CONVERSATIONS, 
+                      GITHUB_SECRET, 
+                      HEALTHCHECK_SERVICES,
+                      HEALTHCHECK_SLEEP_AMOUNT,
+                      HEALTHCHECK_ANOMALY_THRESHOLD)
 
 def create():
     logger = Logger(None)
@@ -30,6 +37,7 @@ def create():
 
     api.add_route('/github', github_resource)
     api.add_route('/dockerhub', dockerhub_resource)
+    start_health_check(handler, HEALTHCHECK_SERVICES, HEALTHCHECK_SLEEP_AMOUNT, HEALTHCHECK_ANOMALY_THRESHOLD)
     return api
 
 app = application = create()
