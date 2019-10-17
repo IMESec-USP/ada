@@ -31,4 +31,4 @@ HEALTHCHECK_SERVICES = {'LH website':'https://lh.imesec.ime.usp.br',
                         'LH API':'https://api.lh.imesec.ime.usp.br/hacks'}
 
 HEALTHCHECK_SLEEP_AMOUNT = 2 * 60
-HEALTHCHECK_ANOMALY_THRESHOLD = 5
+HEALTHCHECK_ANOMALY_THRESHOLD = 3
