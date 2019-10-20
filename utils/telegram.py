@@ -1,6 +1,6 @@
 from itertools import islice
-from telegram.ext import Updater, CommandHandler
-from telegram import ChatAction
+from telegram.ext import Updater, CommandHandler, CallbackQueryHandler
+from telegram import ChatAction, InlineKeyboardMarkup, InlineKeyboardButton
 import re
 import logging
 
@@ -14,6 +14,22 @@ class Handlers:
     def start(update, context):
         context.bot.send_message(chat_id=update.message.chat_id, text=f'Olá, sou a Ada. O ID dessa conversa é {update.message.chat_id}. Se você é o administrador da Ada, sabe o que fazer.')
 
+    @staticmethod
+    def test(update, context):
+        button = InlineKeyboardButton('Deploy', callback_data='Test 123')
+        keyboard = InlineKeyboardMarkup.from_button(button)
+        bot = context.bot
+        bot.send_message(chat_id=update.message.chat_id, text='Isso é um teste de botão.', reply_markup=keyboard)
+
+
+def callback_handler(update, context):
+    bot = context.bot
+    query = update.callback_query
+    print('original message:', query.message.text)
+
+    bot.answer_callback_query(query.id, text='Deployed!')
+    bot.edit_message_text(chat_id=query.message.chat_id, message_id=query.message.message_id, text='Deployed!')
+
 class TelegramHandler:
 
     SLICE_LENGTH = 4096
@@ -26,6 +42,8 @@ class TelegramHandler:
         handlers = [func for func in dir(Handlers) if callable(getattr(Handlers, func)) and not func.startswith("_")]
         for handler_name in handlers:
             self.updater.dispatcher.add_handler(CommandHandler(handler_name, getattr(Handlers, handler_name)))
+
+        self.updater.dispatcher.add_handler(CallbackQueryHandler(callback_handler))
             
     def poll(self):
         self.updater.start_polling()
@@ -33,11 +51,18 @@ class TelegramHandler:
     def broadcast(self, message, filter_str=''):
         bot = self.updater.bot
         for chunk in self.chunks(message):
+<<<<<<< HEAD
             for conversation, filter_regex in self.conversations.items():
                 if not filter_str or re.match(filter_regex, filter_str):
                     bot.send_chat_action(chat_id=conversation, action=ChatAction.TYPING)
                     bot.send_message(chat_id=conversation, text=chunk)
             
+=======
+            for conversation in self.conversations:
+                bot.send_chat_action(chat_id=conversation, action=ChatAction.TYPING)
+                bot.send_message(chat_id=conversation, text=chunk)
+
+>>>>>>> Adds mock of handling of callback queries
     @classmethod
     def chunks(cls, message):
         n = cls.SLICE_LENGTH
