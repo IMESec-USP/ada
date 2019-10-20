@@ -20,7 +20,11 @@ class TelegramHandler:
     def __init__(self, api_token: str, conversations = list):
         self.updater = Updater(api_token, use_context=True)
         self.conversations = conversations
-        self.updater.dispatcher.add_handler(CommandHandler('start', Handlers.start))
+
+        # reflection, baby
+        handlers = [func for func in dir(Handlers) if callable(getattr(Handlers, func)) and not func.startswith("_")]
+        for handler_name in handlers:
+            self.updater.dispatcher.add_handler(CommandHandler(handler_name, getattr(Handlers, handler_name)))
             
     def poll(self):
         self.updater.start_polling()
