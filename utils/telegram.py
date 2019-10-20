@@ -1,6 +1,6 @@
 from itertools import islice
-from telegram.ext import Updater, CommandHandler
-from telegram import ChatAction
+from telegram.ext import Updater, CommandHandler, CallbackQueryHandler
+from telegram import ChatAction, InlineKeyboardMarkup, InlineKeyboardButton
 import logging
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -12,6 +12,22 @@ class Handlers:
     @staticmethod
     def start(update, context):
         context.bot.send_message(chat_id=update.message.chat_id, text=f'Olá, sou a Ada. O ID dessa conversa é {update.message.chat_id}. Se você é o administrador da Ada, sabe o que fazer.')
+
+    @staticmethod
+    def test(update, context):
+        button = InlineKeyboardButton('Deploy', callback_data='Test 123')
+        keyboard = InlineKeyboardMarkup.from_button(button)
+        bot = context.bot
+        bot.send_message(chat_id=update.message.chat_id, text='Isso é um teste de botão.', reply_markup=keyboard)
+
+
+def callback_handler(update, context):
+    bot = context.bot
+    query = update.callback_query
+    print('original message:', query.message.text)
+
+    bot.answer_callback_query(query.id, text='Deployed!')
+    bot.edit_message_text(chat_id=query.message.chat_id, message_id=query.message.message_id, text='Deployed!')
 
 class TelegramHandler:
 
@@ -25,6 +41,8 @@ class TelegramHandler:
         handlers = [func for func in dir(Handlers) if callable(getattr(Handlers, func)) and not func.startswith("_")]
         for handler_name in handlers:
             self.updater.dispatcher.add_handler(CommandHandler(handler_name, getattr(Handlers, handler_name)))
+
+        self.updater.dispatcher.add_handler(CallbackQueryHandler(callback_handler))
             
     def poll(self):
         self.updater.start_polling()
@@ -35,7 +53,7 @@ class TelegramHandler:
             for conversation in self.conversations:
                 bot.send_chat_action(chat_id=conversation, action=ChatAction.TYPING)
                 bot.send_message(chat_id=conversation, text=chunk)
-            
+
     @classmethod
     def chunks(cls, message):
         n = cls.SLICE_LENGTH
