@@ -10,7 +10,7 @@ GITHUB_SECRET = env('GITHUB_SECRET')
 convs_default = {
 	131845033: ".*",
 	-1001342903759: ".*lightning-hacks.*",
-	-388287091: "^((?!lightning-hacks).)*$",
+	-1001284501077: "^((?!lightning-hacks).)*$",
 	211525815: ".*"
 }
 
