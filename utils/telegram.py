@@ -17,7 +17,7 @@ class TelegramHandler:
 
     SLICE_LENGTH = 4096
     
-    def __init__(self, api_token: str, conversations = list):
+    def __init__(self, api_token: str, conversations = dict):
         self.updater = Updater(api_token, use_context=True)
         self.conversations = conversations
         self.updater.dispatcher.add_handler(CommandHandler('start', Handlers.start))
@@ -25,10 +25,10 @@ class TelegramHandler:
     def poll(self):
         self.updater.start_polling()
 
-    def broadcast(self, message):
+    def broadcast(self, message, conversations=self.conversations):
         bot = self.updater.bot
         for chunk in self.chunks(message):
-            for conversation in self.conversations:
+            for conversation in conversations.keys():
                 bot.send_chat_action(chat_id=conversation, action=ChatAction.TYPING)
                 bot.send_message(chat_id=conversation, text=chunk)
             
