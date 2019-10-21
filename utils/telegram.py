@@ -1,6 +1,7 @@
 from itertools import islice
 from telegram.ext import Updater, CommandHandler
 from telegram import ChatAction
+import re
 import logging
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -17,7 +18,7 @@ class TelegramHandler:
 
     SLICE_LENGTH = 4096
     
-    def __init__(self, api_token: str, conversations = dict):
+    def __init__(self, api_token: str, conversations: dict):
         self.updater = Updater(api_token, use_context=True)
         self.conversations = conversations
         self.updater.dispatcher.add_handler(CommandHandler('start', Handlers.start))
@@ -25,12 +26,13 @@ class TelegramHandler:
     def poll(self):
         self.updater.start_polling()
 
-    def broadcast(self, message, conversations=self.conversations):
+    def broadcast(self, message, filter_str=None):
         bot = self.updater.bot
         for chunk in self.chunks(message):
-            for conversation in conversations.keys():
-                bot.send_chat_action(chat_id=conversation, action=ChatAction.TYPING)
-                bot.send_message(chat_id=conversation, text=chunk)
+            for conversation,filter_regex in self.conversations.items():
+                if filter_str and re.match(filter_regex, filter_str):
+                    bot.send_chat_action(chat_id=conversation, action=ChatAction.TYPING)
+                    bot.send_message(chat_id=conversation, text=chunk)
             
     @classmethod
     def chunks(cls, message):

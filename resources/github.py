@@ -40,13 +40,14 @@ class Github(BaseResource):
             '',
             f'Link para comparação: {compare_link}'
         ])
-        self.broadcaster.broadcast(message)
+        self.broadcaster.broadcast(message, repository_name)
 
     def handle_pull_request(self, body: dict):
         target_branch = body['pull_request']['base']['ref']
         if target_branch != 'master':
             return
 
+        repository_name = body['repository']['full_name']
         incoming_branch = body['pull_request']['head']['ref']
         title = body['pull_request']['title']
         sender = body['sender']['login']
@@ -61,4 +62,4 @@ class Github(BaseResource):
             f'Branch sendo mergeada: {incoming_branch}',
             f'Link: {url}'
         ])
-        self.broadcaster.broadcast(message)
+        self.broadcaster.broadcast(message, repository_name)
