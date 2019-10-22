@@ -1,0 +1,3 @@
+[submodule "ansible/ansible-playbooks"]
+	path = ansible/ansible-playbooks
+	url = https://github.com/IMEsec-USP/ansible-playbooks
