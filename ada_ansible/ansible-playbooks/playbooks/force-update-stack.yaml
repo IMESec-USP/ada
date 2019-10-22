@@ -1,0 +1,7 @@
+---
+- hosts: swarm_managers
+  remote_user: <user>
+  become: yes
+  tasks:
+    - name: Force update docker stack
+      shell: docker service ls | tail -n +2 | awk '{ print $2 }' | xargs -n 1 docker service update --force

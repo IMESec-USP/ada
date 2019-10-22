@@ -15,7 +15,6 @@ class __GlobalLock:
         if not lock_result:
             raise AnsibleLockException('could not lock GlobalLock')
 
-        print(f'setting thread that locked to {threading.get_ident()}')
         self.__thread_that_locked = threading.get_ident()
         
         return lock_result

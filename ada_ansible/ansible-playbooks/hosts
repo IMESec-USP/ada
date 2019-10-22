@@ -1,0 +1,13 @@
+all:
+  hosts:
+    torradeira:
+      proxy: imesec.ime.usp.br
+    gaia:
+      proxy: imesec.ime.usp.br
+    imesec:
+      host: imesec.ime.usp.br
+  children:
+    swarm_managers:
+      hosts:
+        torradeira:
+          proxy: imesec.ime.usp.br

@@ -1,0 +1,7 @@
+---
+- hosts: swarm_managers
+  remote_user: <user>
+  become: yes
+  tasks:
+    - name: Redeploys docker stack
+      shell: docker stack deploy imesec -c /services/imesec-stack.yml

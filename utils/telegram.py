@@ -1,6 +1,7 @@
 from itertools import islice
 from telegram.ext import Updater, CommandHandler, CallbackQueryHandler
 from telegram import ChatAction, InlineKeyboardMarkup, InlineKeyboardButton
+from ada_ansible.redeploy_images import redeploy_images
 import logging
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -25,7 +26,7 @@ def callback_handler(update, context):
     bot = context.bot
     query = update.callback_query
     print('original message:', query.message.text)
-
+    redeploy_images()
     bot.answer_callback_query(query.id, text='Deployed!')
     bot.edit_message_text(chat_id=query.message.chat_id, message_id=query.message.message_id, text='Deployed!')
 
