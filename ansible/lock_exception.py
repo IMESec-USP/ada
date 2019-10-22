@@ -1,0 +1,2 @@
+class AnsibleLockException(Exception):
+    pass
