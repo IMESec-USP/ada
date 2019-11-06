@@ -1,7 +1,7 @@
 import time
 import threading
 import requests
-
+from datetime import datetime
 
 def start_health_check(telegram_handler, services, sleep_amount, anomaly_threshold):
     thread = threading.Thread(target=check, args=(telegram_handler, services, sleep_amount, anomaly_threshold))
@@ -18,7 +18,10 @@ def check(telegram_handler, services, sleep_amount, anomaly_threshold):
 
 def check_status(service_name, service_url, anomalies, error_status, telegram_handler, anomaly_threshold):
     response = requests.get(url=service_url)
-    print(f'{service_name} returned {response.status_code}')
+
+    if not is_ok(response):
+        print(f'[{datetime.now().isoformat()}] {service_name} returned {response.status_code}')
+
     is_in_error = error_status[service_name]
 
     if is_in_error ^ is_ok(response):
@@ -30,22 +33,21 @@ def check_status(service_name, service_url, anomalies, error_status, telegram_ha
     if not should_alarm(service_name, anomalies, anomaly_threshold):
         return
 
-    message_type = 'ok' if is_in_error else 'not ok'
-
-    if message_type == 'not ok':
-        message = f'{service_name} is down, received {response.status_code} trying to access {service_url}'
-        telegram_handler.broadcast(message)
-        error_status[service_name] = True
-        anomalies[service_name] = 0
-    
-    else:
+    if is_in_error:
         message = f'{service_name} is OK, all issues resolved.'
-        telegram_handler.broadcast(message)
-        error_status[service_name] = False
-        anomalies[service_name] = 0
+    else:
+        message = f'{service_name} is down, received {response.status_code} trying to access {service_url}'
+
+    considered = 'UP' if is_in_error else 'DOWN'
+    print(f'[{datetime.now().isoformat()}] {service_name} was considered {considered}')
+
+
+    telegram_handler.broadcast(message)
+    error_status[service_name] = not error_status[service_name]
+    anomalies[service_name] = 0
 
 def should_alarm(service_name, anomalies, anomaly_threshold):
     return anomalies[service_name] >= anomaly_threshold
 
 def is_ok(response):
-    return str(response.status_code).startswith('2')
+    return 200 <= response.status_code < 300
