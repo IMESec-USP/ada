@@ -51,18 +51,11 @@ class TelegramHandler:
     def broadcast(self, message, filter_str=''):
         bot = self.updater.bot
         for chunk in self.chunks(message):
-<<<<<<< HEAD
             for conversation, filter_regex in self.conversations.items():
                 if not filter_str or re.match(filter_regex, filter_str):
                     bot.send_chat_action(chat_id=conversation, action=ChatAction.TYPING)
                     bot.send_message(chat_id=conversation, text=chunk)
-            
-=======
-            for conversation in self.conversations:
-                bot.send_chat_action(chat_id=conversation, action=ChatAction.TYPING)
-                bot.send_message(chat_id=conversation, text=chunk)
 
->>>>>>> Adds mock of handling of callback queries
     @classmethod
     def chunks(cls, message):
         n = cls.SLICE_LENGTH
