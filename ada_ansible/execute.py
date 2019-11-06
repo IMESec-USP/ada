@@ -1,19 +1,21 @@
+import json
 import shutil
 
+import ansible.constants as C
 from ansible import context
 from ansible.cli import CLI
+from ansible.executor.task_queue_manager import TaskQueueManager
+from ansible.inventory.manager import InventoryManager
 from ansible.module_utils.common.collections import ImmutableDict
 from ansible.parsing.dataloader import DataLoader
 from ansible.playbook.play import Play
-from ansible.inventory.manager import InventoryManager
-from ansible.executor.task_queue_manager import TaskQueueManager
+from ansible.plugins.callback import CallbackBase
 from ansible.vars.manager import VariableManager
-import ansible.constants as C
 
 from .global_ansible_lock import GlobalLock
 from .lock_exception import AnsibleLockException
 
-def execute(playbook: dict) -> list:
+def execute(playbook: dict) -> int:
     ''' executes an arbitrary playbook '''
 
     try:

@@ -7,8 +7,7 @@ def redeploy_images() -> list:
         hosts = 'swarm_managers',
         gather_facts = 'yes',
         tasks = [
-            dict(action=dict(module='shell', args='ls'), register='shell_out'),
-            dict(action=dict(module='debug', args=dict(msg='{{shell_out.stdout}}')))
+            dict(action=dict(module='shell', args='docker stack deploy imesec -c /services/imesec-stack.yml'), register='shell_out'),
         ]
     )
     return execute(playbook)

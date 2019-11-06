@@ -1,8 +1,12 @@
-from itertools import islice
 from telegram.ext import Updater, CommandHandler, CallbackQueryHandler
 from telegram import ChatAction, InlineKeyboardMarkup, InlineKeyboardButton
-from ada_ansible.redeploy_images import redeploy_images
+
+from itertools import islice
 import logging
+import threading
+from functools import partial
+
+from ada_ansible.redeploy_images import redeploy_images
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                      level=logging.INFO)
@@ -23,12 +27,22 @@ class Handlers:
 
 
 def callback_handler(update, context):
-    bot = context.bot
-    query = update.callback_query
-    print('original message:', query.message.text)
-    redeploy_images()
-    bot.answer_callback_query(query.id, text='Deployed!')
-    bot.edit_message_text(chat_id=query.message.chat_id, message_id=query.message.message_id, text='Deployed!')
+    def in_thread():
+        bot = context.bot
+        query = update.callback_query
+        edit_message = partial(bot.edit_message_text, chat_id=query.message.chat_id, message_id=query.message.message_id)
+
+        edit_message(text='Fazendo update nas imagens necessarias...')
+        bot.answer_callback_query(query.id, text='Fazendo deploy...')
+        results = redeploy_images()
+        if results is None:
+            edit_message(text='Não consegui utilizar o Ansible no momento. Talvez alguém tenha apertado o botão antes de você em algum outro chat.')
+            return
+
+        edit_message(text='Deployed!')
+
+    thread = threading.Thread(target=in_thread, args=tuple())
+    thread.start()
 
 class TelegramHandler:
 
@@ -54,6 +68,9 @@ class TelegramHandler:
             for conversation in self.conversations:
                 bot.send_chat_action(chat_id=conversation, action=ChatAction.TYPING)
                 bot.send_message(chat_id=conversation, text=chunk)
+    
+    def broadcast_deploy(self, message):
+        pass
 
     @classmethod
     def chunks(cls, message):
