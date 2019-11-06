@@ -42,7 +42,7 @@ def check_status(service_name, service_url, anomalies, error_status, telegram_ha
     print(f'[{datetime.now().isoformat()}] {service_name} was considered {considered}')
 
 
-    telegram_handler.broadcast(message)
+    telegram_handler.broadcast(message, service_name)
     error_status[service_name] = not error_status[service_name]
     anomalies[service_name] = 0
 
