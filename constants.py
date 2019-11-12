@@ -28,7 +28,11 @@ def __conversation_subcast(s: str):
 CONVERSATIONS = env.dict('CONVERSATIONS', default_conversations, subcast=__conversation_subcast)
 
 HEALTHCHECK_SERVICES = {'lightning-hacks Website':'https://lh.imesec.ime.usp.br',
-                        'lightning-hacks API':'https://api.lh.imesec.ime.usp.br/hacks'}
+                        'lightning-hacks API':'https://api.lh.imesec.ime.usp.br/hacks',
+                        'lightning-hacks Timer':'https://timer.imesec.ime.usp.br',
+                        'IMEsec wiki':'https://wiki.imesec.ime.usp.br',
+                        'IMEsec Website' : 'https://imesec.ime.usp.br',
+                        }
 
 HEALTHCHECK_SLEEP_AMOUNT = 2 * 60
 HEALTHCHECK_ANOMALY_THRESHOLD = 3
