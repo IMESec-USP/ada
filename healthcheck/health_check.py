@@ -3,20 +3,20 @@ import threading
 import requests
 from datetime import datetime
 
-def start_health_check(telegram_handler, services, sleep_amount, anomaly_threshold):
-    thread = threading.Thread(target=check, args=(telegram_handler, services, sleep_amount, anomaly_threshold))
+def start_health_check(message_handler, services, sleep_amount, anomaly_threshold):
+    thread = threading.Thread(target=check, args=(message_handler, services, sleep_amount, anomaly_threshold))
     thread.start()
 
-def check(telegram_handler, services, sleep_amount, anomaly_threshold):
+def check(message_handler, services, sleep_amount, anomaly_threshold):
     error_status = {name: False for name in services}
     anomalies = {name: 0 for name in services}
 
     while True:
         for service_name, service_url in services.items():
-            check_status(service_name, service_url, anomalies, error_status, telegram_handler, anomaly_threshold)
+            check_status(service_name, service_url, anomalies, error_status, message_handler, anomaly_threshold)
         time.sleep(sleep_amount)
 
-def check_status(service_name, service_url, anomalies, error_status, telegram_handler, anomaly_threshold):
+def check_status(service_name, service_url, anomalies, error_status, message_handler, anomaly_threshold):
     response = requests.get(url=service_url)
 
     if not is_ok(response):
@@ -42,7 +42,7 @@ def check_status(service_name, service_url, anomalies, error_status, telegram_ha
     print(f'[{datetime.now().isoformat()}] {service_name} was considered {considered}')
 
 
-    telegram_handler.broadcast(message, service_name)
+    message_handler.broadcast(message, service_name)
     error_status[service_name] = not error_status[service_name]
     anomalies[service_name] = 0
 
