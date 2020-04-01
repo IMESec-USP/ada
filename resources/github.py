@@ -12,6 +12,7 @@ class Github(BaseResource):
             'push': self.handle_commit,
             'pull_request': self.handle_pull_request,
         }
+        self.needs_json = True
     
     def on_post(self, req, res):
         body = req.context.body
@@ -27,17 +28,14 @@ class Github(BaseResource):
         if 'master' not in body['ref']:
             return
 
-        branch_name = body['ref'].split('/')[-1]
+        branch_name = body['ref']
         commits = body['commits']
         compare_link = body['compare']
         repository_name = body['repository']['full_name']
-        commit_messages = ['- ' + commit['message'] for commit in commits]
         pusher = body['pusher']['name']
-        plural = 's' if len(commit_messages) != 1 else ''
+        plural = 's' if len(commits) != 1 else ''
         message = '\n'.join([
-            f'{pusher} Adicionou {len(commit_messages)} commit{plural} a {repository_name}:{branch_name}.',
-            *commit_messages,
-            '',
+            f'{pusher} Adicionou {len(commits)} commit{plural} a {repository_name}:{branch_name}.',
             f'Link para comparação: {compare_link}'
         ])
         self.broadcaster.broadcast(message, repository_name)
@@ -47,19 +45,19 @@ class Github(BaseResource):
         if target_branch != 'master':
             return
 
+        action = body['action']
+        if action not in ['opened', 'closed']:
+            return
+
         repository_name = body['repository']['full_name']
-        incoming_branch = body['pull_request']['head']['ref']
         title = body['pull_request']['title']
         sender = body['sender']['login']
-        action = body['action']
+
         url = body['pull_request']['html_url']
+        message_verb = 'abriu' if action == 'opened' else 'fechou'
         message = '\n'.join([
-            'Novo status em um pull request:',
-            f'Usuário: {sender}',
-            f'Ação: {action}',
-            f'Título: {title}',
-            f'Branch alvo: {target_branch}',
-            f'Branch sendo mergeada: {incoming_branch}',
+            f'{sender} {message_verb} um pull request:',
+            f'{title}',
             f'Link: {url}'
         ])
         self.broadcaster.broadcast(message, repository_name)
