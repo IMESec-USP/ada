@@ -66,7 +66,7 @@ def check_status(service_name, service_url, anomalies, error_status, message_han
 
     if is_in_error:
         message = f'{service_name} is OK, all issues resolved.'
-    elif response is None:
+    elif exception is not None:
         message = f'{service_name} is down, received the exception {exception} when trying to access {service_url}'
     else:
         message = f'{service_name} is down, received {response.status_code} trying to access {service_url}'
