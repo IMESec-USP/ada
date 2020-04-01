@@ -28,17 +28,14 @@ class Github(BaseResource):
         if 'master' not in body['ref']:
             return
 
-        branch_name = body['ref'].split('/')[-1]
+        branch_name = body['ref']
         commits = body['commits']
         compare_link = body['compare']
         repository_name = body['repository']['full_name']
-        commit_messages = ['- ' + commit['message'] for commit in commits]
         pusher = body['pusher']['name']
-        plural = 's' if len(commit_messages) != 1 else ''
+        plural = 's' if len(commits) != 1 else ''
         message = '\n'.join([
-            f'{pusher} Adicionou {len(commit_messages)} commit{plural} a {repository_name}:{branch_name}.',
-            *commit_messages,
-            '',
+            f'{pusher} Adicionou {len(commits)} commit{plural} a {repository_name}:{branch_name}.',
             f'Link para comparação: {compare_link}'
         ])
         self.broadcaster.broadcast(message, repository_name)
