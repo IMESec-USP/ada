@@ -4,9 +4,12 @@ import falcon
 
 class JsonLoader:
 
+    def __init__(self, ignored_routes=None):
+        self.ignored_routes = ignored_routes if ignored_routes is not None else []
+
     def process_resource(self, req, res, resource, params):
         # dont parse json if we just want the status
-        if type(resource).__name__ == "Metastatus":
+        if type(resource).__name__ in self.ignored_routes:
             return
         try:
             req.context.body = json.loads(req.context.body)

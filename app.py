@@ -18,7 +18,8 @@ from constants import (TELEGRAM_API_TOKEN,
                        GITHUB_SECRET,
                        HEALTHCHECK_SERVICES,
                        HEALTHCHECK_SLEEP_AMOUNT,
-                       HEALTHCHECK_ANOMALY_THRESHOLD)
+                       HEALTHCHECK_ANOMALY_THRESHOLD,
+                       NON_JSON_RESOURCES)
 
 
 def create():
@@ -29,7 +30,7 @@ def create():
     api = falcon.API(middleware=[
         LoggerMiddleware(logger),
         GithubSignatureVerifier(GITHUB_SECRET),
-        JsonLoader(),
+        JsonLoader(NON_JSON_RESOURCES),
     ])
 
     print('polling Telegram...')
