@@ -79,6 +79,4 @@ def should_alarm(service_name, anomalies, anomaly_threshold):
 
 
 def is_ok(response):
-    if response is None:
-        return False
-    return 200 <= response.status_code < 300
+    return response is not None and 200 <= response.status_code < 300
