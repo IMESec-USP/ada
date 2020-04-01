@@ -1,6 +1,4 @@
-
-from func_timeout import StoppableThread
-
+#!/usr/bin/env python3
 from healthcheck.health_check import start_health_check, EventHandler
 from utils.logger import Logger
 from utils.telegram import TelegramHandler
@@ -8,7 +6,6 @@ from utils.telegram import TelegramHandler
 from constants import (TELEGRAM_API_TOKEN,
                        CONVERSATIONS,
                        ADA_URL,
-                       HEALTHCHECK_SERVICES,
                        HEALTHCHECK_SLEEP_AMOUNT,
                        HEALTHCHECK_ANOMALY_THRESHOLD)
 
@@ -24,7 +21,7 @@ class BackupHandler(EventHandler):
             print("It's a miracle! Ada is back to life")
             self.telegram_handler.broadcast("Meu serviço principal foi restaurado. Estou de volta!")
         else:
-            print("ada is ded. starting healthcheck thread")
+            print("Ada is ded. Sending telegram message...")
             self.telegram_handler.broadcast(f"I don't feel so good... Acho que eu morri, estou rodando como backup")
 
 

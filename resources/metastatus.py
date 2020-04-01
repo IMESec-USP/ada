@@ -6,8 +6,6 @@ from .base import BaseResource
 
 class Metastatus(BaseResource):
 
-
-
     def on_get(self, req, res):
         
         res.status = falcon.HTTP_200
