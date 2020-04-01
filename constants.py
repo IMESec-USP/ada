@@ -5,7 +5,7 @@ CHAT_ID_IMESEC_CORE     = -1001284501077
 CHAT_ID_RAZGRIZONE      = 131845033
 CHAT_ID_R0ZBOT          = 211525815
 
-ADA_URL = "http://192.168.1.205:8000/metastatus"
+ADA_URL = "https://ada.imesec.ime.usp.br/metastatus"
 
 env = Env()
 env.read_env()
