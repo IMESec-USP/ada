@@ -12,6 +12,7 @@ class Github(BaseResource):
             'push': self.handle_commit,
             'pull_request': self.handle_pull_request,
         }
+        self.needs_json = True
     
     def on_post(self, req, res):
         body = req.context.body
@@ -47,19 +48,19 @@ class Github(BaseResource):
         if target_branch != 'master':
             return
 
+        action = body['action']
+        if action not in ['opened', 'closed']:
+            return
+
         repository_name = body['repository']['full_name']
-        incoming_branch = body['pull_request']['head']['ref']
         title = body['pull_request']['title']
         sender = body['sender']['login']
-        action = body['action']
+
         url = body['pull_request']['html_url']
+        message_verb = 'abriu' if action == 'opened' else 'fechou'
         message = '\n'.join([
-            'Novo status em um pull request:',
-            f'Usuário: {sender}',
-            f'Ação: {action}',
-            f'Título: {title}',
-            f'Branch alvo: {target_branch}',
-            f'Branch sendo mergeada: {incoming_branch}',
+            f'{sender} {message_verb} um pull request:',
+            f'{title}',
             f'Link: {url}'
         ])
         self.broadcaster.broadcast(message, repository_name)
