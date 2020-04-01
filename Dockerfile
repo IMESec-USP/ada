@@ -12,4 +12,4 @@ run pipenv sync
 
 copy . .
 expose 8000
-cmd ["gunicorn", "-b", "0.0.0.0:8000", "app:app"]
+cmd ["pipenv", "run", "gunicorn", "-b", "0.0.0.0:8000", "app:app"]
