@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from healthcheck.health_check import start_health_check, EventHandler
+from healthcheck.health_check import start_health_check, EventHandler, HealthStatus
 from utils.logger import Logger
 from utils.telegram import TelegramHandler
 
@@ -17,7 +17,7 @@ class BackupHandler(EventHandler):
     def broadcast(self, message, service_name, status):
         # we only care about ada right now
         if service_name != "Ada": return
-        if status == "UP":
+        if status == HealthStatus.UP:
             print("It's a miracle! Ada is back to life")
             self.telegram_handler.broadcast("Meu serviço principal foi restaurado. Estou de volta!")
         else:

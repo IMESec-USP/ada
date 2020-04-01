@@ -1,8 +1,15 @@
 import time
 import threading
+from enum import Enum
+
 import requests
 from datetime import datetime
 from abc import ABC, abstractmethod
+
+
+class HealthStatus(Enum):
+    UP = 'UP'
+    DOWN = 'DOWN'
 
 
 class EventHandler(ABC):
@@ -20,10 +27,8 @@ class TelegramEventHandler(EventHandler):
         self.telegram_handler.broadcast(message, service_name)
 
 
-def start_health_check(event_handler, services, sleep_amount, anomaly_threshold):
-
-    message_handler = event_handler if isinstance(event_handler, EventHandler) else TelegramEventHandler(event_handler)
-    thread = threading.Thread(target=check, args=(message_handler, services, sleep_amount, anomaly_threshold))
+def start_health_check(event_handler: EventHandler, services, sleep_amount, anomaly_threshold):
+    thread = threading.Thread(target=check, args=(event_handler, services, sleep_amount, anomaly_threshold))
     thread.start()
 
 
@@ -66,7 +71,7 @@ def check_status(service_name, service_url, anomalies, error_status, message_han
     else:
         message = f'{service_name} is down, received {response.status_code} trying to access {service_url}'
 
-    considered = 'UP' if is_in_error else 'DOWN'
+    considered = HealthStatus.UP if is_in_error else HealthStatus.DOWN
     print(f'[{datetime.now().isoformat()}] {service_name} was considered {considered}')
 
     message_handler.broadcast(message, service_name, considered)
