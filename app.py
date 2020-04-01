@@ -40,7 +40,7 @@ def create():
 
     api.add_route('/github', github_resource)
     api.add_route('/dockerhub', dockerhub_resource)
-    api.add_route('/metastatus', metastatus_resource)
+    api.add_route('/_healthcheck', metastatus_resource)
     start_health_check(handler, HEALTHCHECK_SERVICES, HEALTHCHECK_SLEEP_AMOUNT, HEALTHCHECK_ANOMALY_THRESHOLD)
     return api
 
