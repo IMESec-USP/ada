@@ -6,7 +6,7 @@ from middleware.logger import LoggerMiddleware
 
 from resources.github import Github
 from resources.docker_hub import DockerHub
-from resources.metastatus import Metastatus
+from resources.self_health import SelfHealth
 
 from utils.logger import Logger
 from utils.telegram import TelegramHandler
@@ -37,11 +37,11 @@ def create():
 
     github_resource = Github(logger, telegram_handler)
     dockerhub_resource = DockerHub(logger, telegram_handler)
-    metastatus_resource = Metastatus(logger, telegram_handler)
+    selfhealth_resource = SelfHealth(logger, telegram_handler)
 
     api.add_route('/github', github_resource)
     api.add_route('/dockerhub', dockerhub_resource)
-    api.add_route('/_healthcheck', metastatus_resource)
+    api.add_route('/_healthcheck', selfhealth_resource)
     start_health_check(TelegramEventHandler(telegram_handler), HEALTHCHECK_SERVICES, HEALTHCHECK_SLEEP_AMOUNT, HEALTHCHECK_ANOMALY_THRESHOLD)
     return api
 

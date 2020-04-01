@@ -9,7 +9,7 @@ class JsonLoader:
 
     def process_resource(self, req, res, resource, params):
         # dont parse json if we just want the status
-        if type(resource).__name__ in self.ignored_routes:
+        if resource.__class__.__name__ in self.ignored_routes:
             return
         try:
             req.context.body = json.loads(req.context.body)

@@ -4,7 +4,7 @@ import json
 from .base import BaseResource
 
 
-class Metastatus(BaseResource):
+class SelfHealth(BaseResource):
 
     def on_get(self, req, res):
         
