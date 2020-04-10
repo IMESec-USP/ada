@@ -6,8 +6,11 @@ from .base import BaseResource
 
 class SelfHealth(BaseResource):
 
+    def __init__(self, logger, telegram_broadcaster):
+        super().__init__(logger, telegram_broadcaster)
+        self.has_json_body = False
+
     def on_get(self, req, res):
-        
         res.status = falcon.HTTP_200
         res.body = json.dumps({
                 'msg': 'pong.'

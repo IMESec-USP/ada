@@ -40,7 +40,3 @@ HEALTHCHECK_SERVICES = {'lightning-hacks Website': 'https://lh.imesec.ime.usp.br
 
 HEALTHCHECK_SLEEP_AMOUNT = 2 * 60
 HEALTHCHECK_ANOMALY_THRESHOLD = 3
-
-NON_JSON_RESOURCES = [
-    'SelfHealth'
-]
