@@ -6,6 +6,7 @@ class DockerHub(BaseResource):
 
     def __init__(self, logger, telegram_broadcaster):
         super().__init__(logger, telegram_broadcaster)
+        self.has_json_body = True
 
     def on_post(self, req, res):
         body = req.context.body
