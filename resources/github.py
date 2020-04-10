@@ -13,7 +13,7 @@ class Github(BaseResource):
             'pull_request': self.handle_pull_request,
         }
         self.has_json_body = True
-    
+
     def on_post(self, req, res):
         body = req.context.body
         action = req.get_header('X-GitHub-Event')
