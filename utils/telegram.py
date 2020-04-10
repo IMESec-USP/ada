@@ -4,6 +4,8 @@ from telegram import ChatAction, InlineKeyboardMarkup, InlineKeyboardButton
 import re
 import logging
 
+from .logger import Logger
+
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                      level=logging.INFO)
 
@@ -33,28 +35,34 @@ def callback_handler(update, context):
 class TelegramHandler:
 
     SLICE_LENGTH = 4096
-    
-    def __init__(self, api_token: str, conversations: dict):
+
+    def __init__(self, logger: Logger, api_token: str, conversations: dict):
         self.updater = Updater(api_token, use_context=True)
         self.conversations = conversations
+        self.logger = logger.with_class_name(self)
 
         # reflection, baby
         handlers = [func for func in dir(Handlers) if callable(getattr(Handlers, func)) and not func.startswith("_")]
+        self.logger.log(f'Adding command handlers for methods {handlers}')
         for handler_name in handlers:
             self.updater.dispatcher.add_handler(CommandHandler(handler_name, getattr(Handlers, handler_name)))
 
         self.updater.dispatcher.add_handler(CallbackQueryHandler(callback_handler))
-            
+
     def poll(self):
+        self.logger.log('Started polling telegram')
         self.updater.start_polling()
 
     def broadcast(self, message, filter_str=''):
         bot = self.updater.bot
+        conversations = [conversation for conversation, filter_regex in self.conversations.items()
+                         if filter_str == '' or re.match(filter_regex, filter_str)]
+        self.logger.log(f'broadcasting message in conversations {conversations}')
+
         for chunk in self.chunks(message):
-            for conversation, filter_regex in self.conversations.items():
-                if not filter_str or re.match(filter_regex, filter_str):
-                    bot.send_chat_action(chat_id=conversation, action=ChatAction.TYPING)
-                    bot.send_message(chat_id=conversation, text=chunk)
+            for conversation in conversations:
+                bot.send_chat_action(chat_id=conversation, action=ChatAction.TYPING)
+                bot.send_message(chat_id=conversation, text=chunk)
 
     @classmethod
     def chunks(cls, message):

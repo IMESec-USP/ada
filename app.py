@@ -23,15 +23,13 @@ from constants import (TELEGRAM_API_TOKEN,
 
 def create():
     logger = Logger(None)
-    telegram_handler = TelegramHandler(TELEGRAM_API_TOKEN, CONVERSATIONS)
+    telegram_handler = TelegramHandler(logger, TELEGRAM_API_TOKEN, CONVERSATIONS)
     telegram_handler.poll()
 
     api = falcon.API(middleware=[
         LoggerMiddleware(logger),
         GithubSignatureVerifier(GITHUB_SECRET),
     ])
-
-    print('polling Telegram...')
 
     github_resource = Github(logger, telegram_handler)
     dockerhub_resource = DockerHub(logger, telegram_handler)
