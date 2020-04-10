@@ -17,7 +17,7 @@ class DockerHub(BaseResource):
             f'Nova imagem de docker no repositório {repo_name}:{tag},',
             f'criada por {pusher}',
         ])
-        self.broadcaster.broadcast(message)
+        self.broadcaster.broadcast(message, 'imesec-core')
 
         self.activate_callback(body)
 
