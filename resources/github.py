@@ -12,7 +12,7 @@ class Github(BaseResource):
             'push': self.handle_commit,
             'pull_request': self.handle_pull_request,
         }
-        self.needs_json = True
+        self.has_json_body = True
     
     def on_post(self, req, res):
         body = req.context.body
