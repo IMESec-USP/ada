@@ -4,3 +4,4 @@ class BaseResource:
         self.logger = logger.with_class_name(self)
         self.broadcaster = telegram_broadcaster
         self.has_json_body = False
+        self.ignore_middleware_log = False

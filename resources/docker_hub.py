@@ -7,6 +7,7 @@ class DockerHub(BaseResource):
     def __init__(self, logger, telegram_broadcaster):
         super().__init__(logger, telegram_broadcaster)
         self.has_json_body = True
+        self.ignore_middleware_log = False
 
     def on_post(self, req, res):
         body = req.context.body
@@ -19,7 +20,6 @@ class DockerHub(BaseResource):
             f'criada por {pusher}',
         ])
         self.broadcaster.broadcast(message, f'dockerhub:{repo_name}')
-
         self.activate_callback(body)
 
     def activate_callback(self, body):
