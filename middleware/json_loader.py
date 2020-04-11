@@ -11,7 +11,6 @@ class JsonLoader:
             return
         try:
             req.context.body = json.loads(req.context.body)
-            self.logger.log(f'body={req.context.body}')
         except json.decoder.JSONDecodeError:
             self.logger.log(f'Could not decode JSON body of request to {resource.__class__.__name__}')
             res.status = falcon.HTTP_400
