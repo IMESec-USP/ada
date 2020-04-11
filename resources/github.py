@@ -20,6 +20,7 @@ class Github(BaseResource):
         action = req.get_header('X-GitHub-Event')
         handler = self.handle_functions.get(action)
 
+        self.logger.log(f'handling action "{action}"')
         if handler is not None:
             handler(body)
 
@@ -61,4 +62,5 @@ class Github(BaseResource):
             f'{title}',
             f'Link: {url}'
         ])
+        self.logger.log(f'broadcasting pull request on {repository_name}')
         self.broadcaster.broadcast(message, repository_name)

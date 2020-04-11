@@ -15,4 +15,4 @@ class SelfHealth(BaseResource):
         res.status = falcon.HTTP_200
         res.body = json.dumps({
                 'msg': 'pong.'
-            }).encode('utf-8')
+        }).encode('utf-8')

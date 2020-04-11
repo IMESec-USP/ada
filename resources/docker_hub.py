@@ -19,6 +19,7 @@ class DockerHub(BaseResource):
             f'Nova imagem de docker no repositório {repo_name}:{tag},',
             f'criada por {pusher}',
         ])
+        self.logger.log(f'broadcasting message abour repo {repo_name}')
         self.broadcaster.broadcast(message, f'dockerhub:{repo_name}')
         self.activate_callback(body)
 
