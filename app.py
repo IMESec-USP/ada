@@ -28,7 +28,8 @@ def create():
 
     api = falcon.API(middleware=[
         LoggerMiddleware(logger),
-        GithubSignatureVerifier(GITHUB_SECRET),
+        GithubSignatureVerifier(logger, GITHUB_SECRET),
+        JsonLoader(logger),
     ])
 
     github_resource = Github(logger, telegram_handler)
