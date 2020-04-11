@@ -48,8 +48,12 @@ class Github(BaseResource):
 
         title = body['issue']['title']
         creator = body['issue']['user']['login']
+        url = body['issue']['html_url']
         message_verb = 'fechou' if action == 'closed' else 'abriu'
-        message = f'{creator} {message_verb} uma issue: {title}'
+        message = '\n'.join([
+            f'{creator} {message_verb} uma issue: {title}',
+            url,
+        ])
 
         self.logger.log(f'broadcasting message about issue {action}')
         self.broadcaster.broadcast(message, 'issue')
