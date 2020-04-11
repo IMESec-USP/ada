@@ -55,8 +55,11 @@ class TelegramHandler:
 
     def broadcast(self, message, filter_str=''):
         bot = self.updater.bot
-        conversations = [conversation for conversation, filter_regex in self.conversations.items()
-                         if filter_str == '' or re.match(filter_regex, filter_str)]
+
+        conversations = []
+        for conversation, filter_regex in self.conversations.items():
+            if filter_str == '' or re.match(filter_regex, filter_str):
+                conversations.append(conversation)
         self.logger.log(f'broadcasting message in conversations {conversations}')
 
         for chunk in self.chunks(message):
