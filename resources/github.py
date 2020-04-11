@@ -11,6 +11,7 @@ class Github(BaseResource):
         self.handle_functions = {
             'push': self.handle_commit,
             'pull_request': self.handle_pull_request,
+            'issues': self.handle_issue,
         }
         self.has_json_body = True
 
@@ -39,6 +40,19 @@ class Github(BaseResource):
             f'Link para comparação: {compare_link}'
         ])
         self.broadcaster.broadcast(message, repository_name)
+
+    def handle_issue(self, body: dict):
+        action = body['action']
+        if action not in ['opened', 'closed']:
+            return
+
+        title = body['issue']['title']
+        creator = body['issue']['user']['login']
+        message_verb = 'abriu' if action == 'opened' else 'fechou'
+        message = f'{creator} {message_verb} uma issue: {title}'
+
+        self.logger.log(f'broadcasting message about issue {action}')
+        self.broadcaster.broadcast(message, 'issue')
 
     def handle_pull_request(self, body: dict):
         target_branch = body['pull_request']['base']['ref']
