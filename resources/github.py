@@ -9,7 +9,6 @@ class Github(BaseResource):
     def __init__(self, logger, telegram_broadcaster):
         super().__init__(logger, telegram_broadcaster)
         self.handle_functions = {
-            'push': self.handle_commit,
             'pull_request': self.handle_pull_request,
         }
         self.has_json_body = True
@@ -25,22 +24,6 @@ class Github(BaseResource):
             handler(body)
 
         res.status = falcon.HTTP_200
-
-    def handle_commit(self, body: dict):
-        if 'master' not in body['ref']:
-            return
-
-        branch_name = body['ref']
-        commits = body['commits']
-        compare_link = body['compare']
-        repository_name = body['repository']['full_name']
-        pusher = body['pusher']['name']
-        plural = 's' if len(commits) != 1 else ''
-        message = '\n'.join([
-            f'{pusher} Adicionou {len(commits)} commit{plural} a {repository_name}:{branch_name}.',
-            f'Link para comparação: {compare_link}'
-        ])
-        self.broadcaster.broadcast(message, repository_name)
 
     def handle_pull_request(self, body: dict):
         target_branch = body['pull_request']['base']['ref']
