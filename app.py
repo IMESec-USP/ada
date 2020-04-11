@@ -39,7 +39,7 @@ def create():
     api.add_route('/github', github_resource)
     api.add_route('/dockerhub', dockerhub_resource)
     api.add_route('/_healthcheck', selfhealth_resource)
-    start_health_check(TelegramEventHandler(telegram_handler), HEALTHCHECK_SERVICES, HEALTHCHECK_SLEEP_AMOUNT, HEALTHCHECK_ANOMALY_THRESHOLD)
+    start_health_check(logger, TelegramEventHandler(telegram_handler), HEALTHCHECK_SERVICES, HEALTHCHECK_SLEEP_AMOUNT, HEALTHCHECK_ANOMALY_THRESHOLD)
     return api
 
 
