@@ -10,6 +10,7 @@ class Github(BaseResource):
         super().__init__(logger, telegram_broadcaster)
         self.handle_functions = {
             'pull_request': self.handle_pull_request,
+            'issues': self.handle_issue,
         }
         self.has_json_body = True
         self.ignore_middleware_log = False
@@ -24,6 +25,23 @@ class Github(BaseResource):
             handler(body)
 
         res.status = falcon.HTTP_200
+
+    def handle_issue(self, body: dict):
+        action = body['action']
+        if action not in ['opened', 'closed', 'reopened']:
+            return
+
+        title = body['issue']['title']
+        creator = body['issue']['user']['login']
+        url = body['issue']['html_url']
+        message_verb = 'fechou' if action == 'closed' else 'abriu'
+        message = '\n'.join([
+            f'{creator} {message_verb} uma issue: {title}',
+            url,
+        ])
+
+        self.logger.log(f'broadcasting message about issue {action}')
+        self.broadcaster.broadcast(message, 'issue')
 
     def handle_pull_request(self, body: dict):
         target_branch = body['pull_request']['base']['ref']
