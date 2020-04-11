@@ -43,12 +43,12 @@ class Github(BaseResource):
 
     def handle_issue(self, body: dict):
         action = body['action']
-        if action not in ['opened', 'closed']:
+        if action not in ['opened', 'closed', 'reopened']:
             return
 
         title = body['issue']['title']
         creator = body['issue']['user']['login']
-        message_verb = 'abriu' if action == 'opened' else 'fechou'
+        message_verb = 'fechou' if action == 'closed' else 'abriu'
         message = f'{creator} {message_verb} uma issue: {title}'
 
         self.logger.log(f'broadcasting message about issue {action}')
