@@ -27,22 +27,22 @@ class TelegramEventHandler(EventHandler):
         self.telegram_handler.broadcast(message, service_name)
 
 
-def start_health_check(event_handler: EventHandler, services, sleep_amount, anomaly_threshold):
-    thread = threading.Thread(target=check, args=(event_handler, services, sleep_amount, anomaly_threshold))
+def start_health_check(logger, event_handler: EventHandler, services, sleep_amount, anomaly_threshold):
+    thread = threading.Thread(target=check, args=(logger, event_handler, services, sleep_amount, anomaly_threshold))
     thread.start()
 
 
-def check(message_handler, services, sleep_amount, anomaly_threshold):
+def check(logger, message_handler, services, sleep_amount, anomaly_threshold):
     error_status = {name: False for name in services}
     anomalies = {name: 0 for name in services}
 
     while True:
         for service_name, service_url in services.items():
-            check_status(service_name, service_url, anomalies, error_status, message_handler, anomaly_threshold)
+            check_status(logger, service_name, service_url, anomalies, error_status, message_handler, anomaly_threshold)
         time.sleep(sleep_amount)
 
 
-def check_status(service_name, service_url, anomalies, error_status, message_handler, anomaly_threshold):
+def check_status(logger, service_name, service_url, anomalies, error_status, message_handler, anomaly_threshold):
     response = None
     exception = None
     try:
@@ -51,7 +51,7 @@ def check_status(service_name, service_url, anomalies, error_status, message_han
         exception = e
 
     if not is_ok(response):
-        print(f'[{datetime.now().isoformat()}] {service_name} returned {response.status_code if response is not None else exception}')
+        logger.log(f'{service_name} returned {response.status_code if response is not None else exception}')
 
     is_in_error = error_status[service_name]
 
@@ -72,7 +72,7 @@ def check_status(service_name, service_url, anomalies, error_status, message_han
         message = f'{service_name} is down, received {response.status_code} trying to access {service_url}'
 
     considered = HealthStatus.UP if is_in_error else HealthStatus.DOWN
-    print(f'[{datetime.now().isoformat()}] {service_name} was considered {considered}')
+    logger.log(f'{service_name} was considered {considered}')
 
     message_handler.broadcast(message, service_name, considered)
     error_status[service_name] = not error_status[service_name]

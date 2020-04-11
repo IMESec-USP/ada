@@ -23,15 +23,14 @@ from constants import (TELEGRAM_API_TOKEN,
 
 def create():
     logger = Logger(None)
-    telegram_handler = TelegramHandler(TELEGRAM_API_TOKEN, CONVERSATIONS)
+    telegram_handler = TelegramHandler(logger, TELEGRAM_API_TOKEN, CONVERSATIONS)
     telegram_handler.poll()
 
     api = falcon.API(middleware=[
         LoggerMiddleware(logger),
-        GithubSignatureVerifier(GITHUB_SECRET),
+        GithubSignatureVerifier(logger, GITHUB_SECRET),
+        JsonLoader(logger),
     ])
-
-    print('polling Telegram...')
 
     github_resource = Github(logger, telegram_handler)
     dockerhub_resource = DockerHub(logger, telegram_handler)
@@ -40,7 +39,7 @@ def create():
     api.add_route('/github', github_resource)
     api.add_route('/dockerhub', dockerhub_resource)
     api.add_route('/_healthcheck', selfhealth_resource)
-    start_health_check(TelegramEventHandler(telegram_handler), HEALTHCHECK_SERVICES, HEALTHCHECK_SLEEP_AMOUNT, HEALTHCHECK_ANOMALY_THRESHOLD)
+    start_health_check(logger, TelegramEventHandler(telegram_handler), HEALTHCHECK_SERVICES, HEALTHCHECK_SLEEP_AMOUNT, HEALTHCHECK_ANOMALY_THRESHOLD)
     return api
 
 
