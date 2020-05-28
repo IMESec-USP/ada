@@ -4,6 +4,6 @@ class LoggerMiddleware:
         self.logger = logger.with_class_name(self)
 
     def process_response(self, req, res, resource, req_succeded):
-        if resource.ignore_middleware_log:
+        if getattr(resource, 'ignore_middleware_log', False):
             return
         self.logger.log(f'{res.status} {req.method} {req.relative_uri}')

@@ -7,7 +7,7 @@ class JsonLoader:
         self.logger = logger.with_class_name(self)
 
     def process_resource(self, req, res, resource, params):
-        if not resource.has_json_body:
+        if not getattr(resource, 'has_json_body', False):
             return
         try:
             req.context.body = json.loads(req.context.body)
