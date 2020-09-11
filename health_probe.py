@@ -11,23 +11,24 @@ from constants import (STICKER_ID_KK_MORRI, TELEGRAM_API_TOKEN,
 
 
 class BackupHandler(EventHandler):
-    def __init__(self, telegram_handler):
+    def __init__(self, logger, telegram_handler):
         self.telegram_handler = telegram_handler
+        self.logger = logger
 
     def broadcast(self, message, service_name, status):
         # we only care about ada right now
         if service_name != 'Ada': return
         if status == HealthStatus.UP:
-            print("It's a miracle! Ada is back to life")
+            self.logger.log("It's a miracle! Ada is back to life")
             self.telegram_handler.broadcast('Meu serviço principal foi restaurado. Estou de volta!')
         else:
-            print('Ada is ded. Sending telegram message...')
+            self.logger.log('Ada is ded. Sending telegram message...')
             self.telegram_handler.broadcast(f"I don't feel so good... estou rodando como backup", sticker=STICKER_ID_KK_MORRI)
 
 
 if __name__ == '__main__':
     logger = Logger(None)
     handler = TelegramHandler(logger, TELEGRAM_API_TOKEN, CONVERSATIONS)
-    backup_handler = BackupHandler(handler)
+    backup_handler = BackupHandler(logger, handler)
     start_health_check(logger, backup_handler, {'Ada': ADA_URL}, HEALTHCHECK_SLEEP_AMOUNT, HEALTHCHECK_ANOMALY_THRESHOLD)
 
