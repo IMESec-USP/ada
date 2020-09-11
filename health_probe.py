@@ -3,7 +3,7 @@ from healthcheck.health_check import start_health_check, EventHandler, HealthSta
 from utils.logger import Logger
 from utils.telegram import TelegramHandler
 
-from constants import (TELEGRAM_API_TOKEN,
+from constants import (STICKER_ID_KK_MORRI, TELEGRAM_API_TOKEN,
                        CONVERSATIONS,
                        ADA_URL,
                        HEALTHCHECK_SLEEP_AMOUNT,
@@ -22,12 +22,12 @@ class BackupHandler(EventHandler):
             self.telegram_handler.broadcast('Meu serviço principal foi restaurado. Estou de volta!')
         else:
             print('Ada is ded. Sending telegram message...')
-            self.telegram_handler.broadcast(f"I don't feel so good... Acho que eu morri, estou rodando como backup")
+            self.telegram_handler.broadcast(f"I don't feel so good... estou rodando como backup", sticker=STICKER_ID_KK_MORRI)
 
 
 if __name__ == '__main__':
     logger = Logger(None)
-    handler = TelegramHandler(TELEGRAM_API_TOKEN, CONVERSATIONS)
+    handler = TelegramHandler(logger, TELEGRAM_API_TOKEN, CONVERSATIONS)
     backup_handler = BackupHandler(handler)
-    start_health_check(backup_handler, {'Ada': ADA_URL}, HEALTHCHECK_SLEEP_AMOUNT, HEALTHCHECK_ANOMALY_THRESHOLD)
+    start_health_check(logger, backup_handler, {'Ada': ADA_URL}, HEALTHCHECK_SLEEP_AMOUNT, HEALTHCHECK_ANOMALY_THRESHOLD)
 

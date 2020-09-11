@@ -53,7 +53,7 @@ class TelegramHandler:
         self.logger.log('Started polling telegram')
         self.updater.start_polling()
 
-    def broadcast(self, message, filter_str=''):
+    def broadcast(self, message, filter_str='', sticker=None):
         bot = self.updater.bot
 
         conversations = []
@@ -66,6 +66,7 @@ class TelegramHandler:
             for conversation in conversations:
                 bot.send_chat_action(chat_id=conversation, action=ChatAction.TYPING)
                 bot.send_message(chat_id=conversation, text=chunk)
+                if sticker: bot.send_sticker(chat_id=conversation, text=chunk, sticker=sticker)
 
     @classmethod
     def chunks(cls, message):
