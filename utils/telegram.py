@@ -62,11 +62,11 @@ class TelegramHandler:
                 conversations.append(conversation)
         self.logger.log(f'broadcasting message in conversations {conversations}')
 
-        for chunk in self.chunks(message):
-            for conversation in conversations:
+        for conversation in conversations:
+            for chunk in self.chunks(message):
                 bot.send_chat_action(chat_id=conversation, action=ChatAction.TYPING)
                 bot.send_message(chat_id=conversation, text=chunk)
-                if sticker: bot.send_sticker(chat_id=conversation, text=chunk, sticker=sticker)
+            if sticker: bot.send_sticker(chat_id=conversation, sticker=sticker)
 
     @classmethod
     def chunks(cls, message):
