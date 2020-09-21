@@ -7,6 +7,8 @@ CHAT_ID_R0ZBOT          = 211525815
 
 ADA_URL = 'https://ada.imesec.ime.usp.br/_healthcheck'
 
+STICKER_ID_KK_MORRI = 'CAACAgEAAxkBAAEBUeVfWvNObQABfZeZEcdQIsqX62ZYMkYAAgUAA7egmwxPKqv9NDFYYxsE'
+
 env = Env()
 env.read_env()
 
