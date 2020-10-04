@@ -28,40 +28,64 @@ class Github(BaseResource):
 
     def handle_issue(self, body: dict):
         action = body['action']
-        if action not in ['opened', 'closed', 'reopened']:
-            return
-
         title = body['issue']['title']
         creator = body['issue']['user']['login']
+        number = body['issue']['number']
         url = body['issue']['html_url']
-        message_verb = 'fechou' if action == 'closed' else 'abriu'
-        message = '\n'.join([
-            f'{creator} {message_verb} uma issue: {title}',
-            url,
-        ])
+
+        message_verb = ''
+        if action == 'opened':
+            message_verb = 'abriu'
+        elif action == 'locked':
+            message_verb = 'trancou'
+        elif action == 'unlocked':
+            message_verb = 'destrancou'
+        elif action == 'deleted':
+            message_verb = 'deletou'
+        elif action == 'reopened':
+            message_verb = 'reabriu'
+        elif action == 'closed':
+            message_verb = 'fechou'
+        else:
+            return
+
+        message = f'{creator} {message_verb} uma issue: [\#{number} \- `{title}`]({url})'
 
         self.logger.log(f'broadcasting message about issue {action}')
-        self.broadcaster.broadcast(message, 'issue')
+        self.broadcaster.broadcast(message, 'issue', parse_mode='MarkdownV2')
 
     def handle_pull_request(self, body: dict):
         target_branch = body['pull_request']['base']['ref']
-        if target_branch != 'master':
+        if target_branch not in ['master', 'main']:
             return
 
         action = body['action']
-        if action not in ['opened', 'closed']:
-            return
-
         repository_name = body['repository']['full_name']
         title = body['pull_request']['title']
+        number = body['number']
         sender = body['sender']['login']
-
+        merged = body['pull_request']['merged']
         url = body['pull_request']['html_url']
-        message_verb = 'abriu' if action == 'opened' else 'fechou'
+
+        message_verb = ''
+        if action == 'opened':
+            message_verb = 'abriu'
+        elif action == 'locked':
+            message_verb = 'trancou'
+        elif action == 'unlocked':
+            message_verb = 'destrancou'
+        elif action == 'review_requested':
+            message_verb = 'pediu review em'
+        elif action == 'reopened':
+            message_verb = 'reabriu'
+        elif action == 'closed':
+            message_verb = 'mergeou' if merged else 'fechou'
+        else:
+            return
+        
         message = '\n'.join([
             f'{sender} {message_verb} um pull request:',
-            f'{title}',
-            f'Link: {url}'
+            f'[\#{number} \- `{title}`]({url})'
         ])
         self.logger.log(f'broadcasting pull request on {repository_name}')
-        self.broadcaster.broadcast(message, repository_name)
+        self.broadcaster.broadcast(message, repository_name, parse_mode='MarkdownV2')
