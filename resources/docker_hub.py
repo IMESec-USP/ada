@@ -21,7 +21,7 @@ class DockerHub(BaseResource):
             f'criada por {pusher}',
         ])
         self.logger.log(f'broadcasting message about repo {repo_name}')
-        self.broadcaster.broadcast(message, f'dockerhub:{repo_name}')
+        self.broadcaster.broadcast(message, f'dockerhub:{repo_name}', parse_mode='MarkdownV2')
         self.activate_callback(body)
 
     def activate_callback(self, body):
