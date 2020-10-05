@@ -6,6 +6,16 @@ from .base import BaseResource
 
 class Github(BaseResource):
 
+    verbs = {
+        'opened': 'abriu',
+        'locked': 'trancou',
+        'unlocked': 'destrancou',
+        'deleted': 'deletou',
+        'reopened': 'reabriu',
+        'closed': 'fechou',
+        'review_requested': 'pediu review em',
+    }
+
     def __init__(self, logger, telegram_broadcaster):
         super().__init__(logger, telegram_broadcaster)
         self.handle_functions = {
@@ -33,21 +43,10 @@ class Github(BaseResource):
         number = body['issue']['number']
         url = body['issue']['html_url']
 
-        message_verb = ''
-        if action == 'opened':
-            message_verb = 'abriu'
-        elif action == 'locked':
-            message_verb = 'trancou'
-        elif action == 'unlocked':
-            message_verb = 'destrancou'
-        elif action == 'deleted':
-            message_verb = 'deletou'
-        elif action == 'reopened':
-            message_verb = 'reabriu'
-        elif action == 'closed':
-            message_verb = 'fechou'
-        else:
+        if not action in self.verbs:
+            self.logger.log(f'Unsupported action received: {action}')
             return
+        message_verb = self.verbs[action]
 
         message = f'{creator} {message_verb} uma issue: [\#{number} \- `{title}`]({url})'
 
@@ -67,21 +66,13 @@ class Github(BaseResource):
         merged = body['pull_request']['merged']
         url = body['pull_request']['html_url']
 
-        message_verb = ''
-        if action == 'opened':
-            message_verb = 'abriu'
-        elif action == 'locked':
-            message_verb = 'trancou'
-        elif action == 'unlocked':
-            message_verb = 'destrancou'
-        elif action == 'review_requested':
-            message_verb = 'pediu review em'
-        elif action == 'reopened':
-            message_verb = 'reabriu'
-        elif action == 'closed':
-            message_verb = 'mergeou' if merged else 'fechou'
-        else:
+        if not action in self.verbs:
+            self.logger.log(f'Unsupported action received: {action}')
             return
+        message_verb = self.verbs[action]
+
+        if action == 'closed' and merged:
+            message_verb = 'mergeou'
         
         message = '\n'.join([
             f'{sender} {message_verb} um pull request:',
