@@ -12,11 +12,12 @@ class DockerHub(BaseResource):
     def on_post(self, req, res):
         body = req.context.body
         repo_name = body['repository']['repo_name']
+        repo_url = body['repository']['repo_url']
         tag = body['push_data']['tag']
         pusher = body['push_data']['pusher']
 
         message = '\n'.join([
-            f'Nova imagem de docker no repositório {repo_name}:{tag},',
+            f'Nova imagem de docker no repositório [{repo_name}]({repo_url}):{tag},',
             f'criada por {pusher}',
         ])
         self.logger.log(f'broadcasting message about repo {repo_name}')
