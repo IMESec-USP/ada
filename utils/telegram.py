@@ -1,6 +1,6 @@
 from itertools import islice
 from telegram.ext import Updater, CommandHandler, CallbackQueryHandler
-from telegram import ChatAction, InlineKeyboardMarkup, InlineKeyboardButton
+from telegram import ChatAction, InlineKeyboardMarkup, InlineKeyboardButton, error
 import re
 import logging
 
@@ -63,10 +63,14 @@ class TelegramHandler:
         self.logger.log(f'broadcasting message in conversations {conversations}')
 
         for conversation in conversations:
-            for chunk in self.chunks(message):
-                bot.send_chat_action(chat_id=conversation, action=ChatAction.TYPING)
-                bot.send_message(chat_id=conversation, text=chunk, parse_mode=parse_mode, disable_web_page_preview=True)
-            if sticker: bot.send_sticker(chat_id=conversation, sticker=sticker)
+            try:
+                for chunk in self.chunks(message):
+                    bot.send_chat_action(chat_id=conversation, action=ChatAction.TYPING)
+                    bot.send_message(chat_id=conversation, text=chunk, parse_mode=parse_mode, disable_web_page_preview=True)
+                if sticker: bot.send_sticker(chat_id=conversation, sticker=sticker)
+            except error.BadRequest as err:
+                self.logger.log(f'failed to send message to {conversation}:')
+                self.logger.log(err)
 
     @classmethod
     def chunks(cls, message):
