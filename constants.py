@@ -38,5 +38,5 @@ HEALTHCHECK_SERVICES = {'lightning-hacks Website': 'https://lh.imesec.ime.usp.br
                         'IMEsec Website': 'https://imesec.ime.usp.br'
                         }
 
-HEALTHCHECK_SLEEP_AMOUNT = 2 * 60
+HEALTHCHECK_SLEEP_AMOUNT = int(env('HEALTHCHECK_SLEEP_AMOUNT')) or 30
 HEALTHCHECK_ANOMALY_THRESHOLD = 3
